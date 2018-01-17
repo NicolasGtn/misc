@@ -80,7 +80,7 @@ void add_vf32vector(vfloat32 *vX1, vfloat32 *vX2, int n, vfloat32 *vY)
 vfloat32 dot_vf32vector(vfloat32 *vX1, vfloat32 *vX2, int n)
 // ---------------------------------------------------------
 {
-    vfloat32 z;
+    vfloat32 z[4];
     vfloat32 x1, x2, p, s;
 
     for(int i=0; i<n; i++) {   
@@ -90,10 +90,13 @@ vfloat32 dot_vf32vector(vfloat32 *vX1, vfloat32 *vX2, int n)
         s = _mm_shuffle_ps(p, p, _MM_SHUFFLE(2,1,0,3)); //s = [b,c,d,a]
         s = _mm_add_ps(p, s);                           //s = [a+b,b+c,c+d,d+a]
         p = _mm_shuffle_ps(s, s, _MM_SHUFFLE(1,0,3,2)); //p = [c+d,a+d,a+b,b+c]
-        z = _mm_add_ps(p, s);                           //z = [a+b+c+d, ...]
+        _mm_store_ps(&z[i], _mm_add_ps(p, s));          //z = [a+b+c+d, ...]
     }
+    p = _mm_shuffle_ps(z[0], z[1], _MM_SHUFFLE(3,2,3,2));
+    s = _mm_shuffle_ps(z[2], z[3], _MM_SHUFFLE(3,2,3,2));
+    s = _mm_shuffle_ps(p, s, _MM_SHUFFLE(3,1,3,1));
 
-    return z; // attention il faut retourner un registre SIMD et non un scalaire
+    return s; // attention il faut retourner un registre SIMD et non un scalaire
 
 }
 // ----------------------------------------------------

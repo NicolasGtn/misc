@@ -381,7 +381,7 @@ void test_cond_vf32ector(void)
     // -- free -- //
     // ---------- //
     
-    free_vf32vector(vX, vi0b, vi1b);
+    //free_vf32vector(vX, vi0b, vi1b);
 }
 // ------------------
 void test_simd1(void)
