@@ -117,7 +117,7 @@ void sum3_vf32vector(vfloat32 *vX, int n, vfloat32 *vY)
         curr = _mm_add_ps(curr, b);
 
         _mm_store_ps((float*) &vY[i-1], curr);
-    } 
+    }
 }
 // ----------------------------------------------------
 void sum5_vf32vector(vfloat32 *vX, int n, vfloat32 *vY)
@@ -148,16 +148,72 @@ void sum5_vf32vector(vfloat32 *vX, int n, vfloat32 *vY)
 void min3_vf32vector(vfloat32 *vX, int n, vfloat32 *vY)
 // ----------------------------------------------------
 {
+    vfloat32 prev, curr, next;
+    vfloat32 a,b;
+    for(int i=1; i<=n; i++) {
+        prev = _mm_load_ps((float32*) &vX[i-1]);
+        curr = _mm_load_ps((float32*) &vX[i]);
+        next = _mm_load_ps((float32*) &vX[i+1]);
+
+        a = _mm_shuffle_ps(prev, curr, _MM_SHUFFLE(1,0,3,2));
+        a = _mm_shuffle_ps(a, curr, _MM_SHUFFLE(2,1,2,1));
+
+        b = _mm_shuffle_ps(curr, next, _MM_SHUFFLE(1,0,3,2));
+        b = _mm_shuffle_ps(curr, b, _MM_SHUFFLE(2,1,2,1));
+
+        curr = _mm_min_ps(curr, a);
+        curr = _mm_min_ps(curr, b);
+
+        _mm_store_ps((float*) &vY[i-1], curr);
+    }
 }
 // ----------------------------------------------------
 void min5_vf32vector(vfloat32 *vX, int n, vfloat32 *vY)
 // ----------------------------------------------------
 {
+    vfloat32 prev, curr, next;
+    vfloat32 a,b,c,d;
+    for(int i=1; i<=n; i++) {
+        prev = _mm_load_ps((float32*) &vX[i-1]);
+        curr = _mm_load_ps((float32*) &vX[i]);
+        next = _mm_load_ps((float32*) &vX[i+1]);
+
+        a = _mm_shuffle_ps(prev, curr, _MM_SHUFFLE(1,0,3,2));
+        b = _mm_shuffle_ps(a, curr, _MM_SHUFFLE(2,1,2,1));
+
+        c = _mm_shuffle_ps(curr, next, _MM_SHUFFLE(1,0,3,2));
+        d = _mm_shuffle_ps(curr, c, _MM_SHUFFLE(2,1,2,1));
+
+        a = _mm_min_ps(a, b);
+        c = _mm_min_ps(c, d);
+        a = _mm_min_ps(a,c);
+        curr = _mm_min_ps(curr, a);
+
+        _mm_store_ps((float*) &vY[i-1], curr);
+    }
 }
 // -------------------------------------------------------------
 void positive_add3_vf32vector(vfloat32 *vX, int n, vfloat32 *vY)
 // -------------------------------------------------------------
 {
+    vfloat32 x, y , a, *vT;
+
+    //vT = vf32vector (-1, 16);
+
+    for(int i=1; i<=n; i++) {
+        x = _mm_load_ps((float32*) &vX[i]);
+        y = _mm_load_ps((float32*) &vY[i]);
+
+        a = _mm_cmplt_ps(y, x);
+        a = _mm_and_ps(a, x);
+        display_f32vector((float32*) &a, 0, 3, "%6.0f ", "a");
+    }
+/*
+    k1=_mm_set_ps(1,1,1,1);
+    k2=_mm_set_ps(-2,-2,-2,-2);
+    c=_mm_cmplt_ps(a,b);
+    k=_mm_or_ps(_mm_and_ps(c,k2),_mm_andnot_ps(c,k1));
+    d=_mm_add_ps(d,k); // incrément*/
 }
 // -------------------------------------------------------------
 void positive_avg3_vf32vector(vfloat32 *vX, int n, vfloat32 *vY)

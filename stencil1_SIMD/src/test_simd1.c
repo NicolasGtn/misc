@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 #include "nrdef.h"
 #include "nrutil.h"
@@ -136,7 +137,7 @@ void test_sum_vf32vector(void)
     // -- allocation des tableaux 1D vectoriels -- //
     // ------------------------------------------- //
 
-    vX  = vf32vector(vi0, vi1+8);
+    vX  = vf32vector(vi0, vi1+2);
     vY3 = vf32vector(vi0, vi1);
     vY5 = vf32vector(vi0, vi1);
 
@@ -146,7 +147,7 @@ void test_sum_vf32vector(void)
 
     init_vf32vector_param(vX, vi0+1, vi1+1, 1, 1);
     zero_vf32vector(vX, vi0, vi0);
-    zero_vf32vector(vX+vi1, vi1, vi1);
+    zero_vf32vector(vX, vi1+2, vi1+2);
     zero_vf32vector(vY3, vi0, vi1);
     zero_vf32vector(vY5, vi0, vi1);
 
@@ -218,8 +219,7 @@ void test_min_vf32vector(void)
     // ------------------------------------------- //
     // -- allocation des tableaux 1D vectoriels -- //
     // ------------------------------------------- //
-
-    vX  = vf32vector(vi0, vi1);
+    vX  = vf32vector(vi0, vi1+2);
     vY3 = vf32vector(vi0, vi1);
     vY5 = vf32vector(vi0, vi1);
 
@@ -227,8 +227,10 @@ void test_min_vf32vector(void)
     // -- init -- //
     // ---------- //
 
-    init_vf32vector_param(vX, vi0, vi1, 1, 2);
-    rand_f32vector((float32*) vX, si0, si1); // generateur de nombres aleatoires (congruence lineaire)
+    init_vf32vector_param(vX, vi0+1, vi1+1, 1, 2);
+    init_vf32vector_param(vX, vi0, vi0, FLT_MAX, FLT_MAX);
+    init_vf32vector_param(vX, vi1+2, vi1+2, FLT_MAX, FLT_MAX);
+    rand_f32vector((float32*) vX, si0+4, si1+4); // generateur de nombres aleatoires (congruence lineaire)
     zero_vf32vector(vY3, vi0, vi1);
     zero_vf32vector(vY5, vi0, vi1);
 
@@ -237,7 +239,7 @@ void test_min_vf32vector(void)
     // --------------- //
 
     // affichage classique sur une ligne: appel de la fonction scalaire
-    display_f32vector((float32*) vX, si0, si1, "%4.0f", "sX1");
+    display_f32vector((float32*) vX, si0+4, si1+4, "%4.0f", "sX1");
 
     // affichage par bloc SIMD: appel de la fonction SIMD
     //display_vf32vector(vX, vi0, vi1, "%4.0f", "vX"); puts("");
@@ -286,7 +288,7 @@ void test_cond_vf32ector(void)
     vfloat32 avg;
     
     char* format = "%6.2f ";
-    
+
     // chronometrie
     int iter, niter = 4;
     int run, nrun = 5;
@@ -326,6 +328,8 @@ void test_cond_vf32ector(void)
     vX = vf32vector (vi0b, vi1b);
     vY = vf32vector (vi0,  vi1);
     sX = (float32*) vX; // wrapper scalaire
+
+    printf("si0 = %d\nsi1 = %d\nsi0b = %d\nsi1b = %d\n", si0, si1, si0b,si1b);
     // ---------- //
     // -- init -- //
     // ---------- //
@@ -388,7 +392,7 @@ void test_simd1(void)
     puts("================");
     
     //test_add_dot_vf32vector();
-    test_sum_vf32vector();
+    //test_sum_vf32vector();
     //test_min_vf32vector();
-    //test_cond_vf32ector();
+    test_cond_vf32ector();
 }
